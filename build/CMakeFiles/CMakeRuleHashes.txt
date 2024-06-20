@@ -1,0 +1,2 @@
+# Hashes of file build rules.
+ba60f8a499bb1c12c9bf1fd11a32d65d /home/sesa214884/GIT/coursera/assignment-1-sbaans/assignment-autotest/test/assignment1/Test_hello_Runner.c
