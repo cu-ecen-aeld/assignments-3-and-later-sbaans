@@ -81,6 +81,7 @@ bool do_exec(int count, ...)
 */
 
     /* Fork */
+    fflush(stdout);
     forkpid = fork();
     
     if (forkpid == -1)
@@ -93,10 +94,8 @@ bool do_exec(int count, ...)
     if (forkpid == 0)
     {
         /* Call execv */
-    /*    printf("\n exec with arguments : %s %s ", command[0], command[1]);*/
       returnedexec = execv(command[0],command);
- 
-        
+     
         if ( returnedexec == -1 )
         {
             /* execv failed */
@@ -188,6 +187,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     }
 
     /* Fork */
+    fflush(stdout);
     forkpid = fork();
     
     if (forkpid == -1)
@@ -205,7 +205,6 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
           exit (EXIT_FAILURE);  
         }
         /* Call execv */
-    /*    printf("\n exec with arguments : %s %s ", command[0], command[1]);*/
       returnedexec = execv(command[0],command);
  
         
