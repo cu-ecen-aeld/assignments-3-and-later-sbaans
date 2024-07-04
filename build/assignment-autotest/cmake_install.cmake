@@ -1,4 +1,4 @@
-# Install script for directory: /home/sesa214884/GIT/coursera/assignment-1-sbaans/assignment-autotest
+# Install script for directory: /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/assignment-autotest
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/sesa214884/GIT/coursera/assignment-1-sbaans/build/assignment-autotest/Unity/cmake_install.cmake")
+  include("/home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/build/assignment-autotest/Unity/cmake_install.cmake")
 
 endif()
 

@@ -1,3 +1,8 @@
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
 #include "systemcalls.h"
 
 /**
@@ -16,9 +21,17 @@ bool do_system(const char *cmd)
  *   and return a boolean true if the system() call completed with success
  *   or false() if it returned a failure
 */
-
-
-
+    int retvalue;
+    
+    /* Call system function */
+    retvalue = system(cmd);
+    
+    /* Test if the system call completed with success or not */
+    if (retvalue == -1)
+    {
+        /* The system call could not be completed */   
+        return false;
+    }
     return true;
 }
 
@@ -38,6 +51,11 @@ bool do_system(const char *cmd)
 
 bool do_exec(int count, ...)
 {
+    pid_t forkpid;
+    int returnedvalue;
+    int returnedexec;
+    int returnedwait;
+    
     va_list args;
     va_start(args, count);
     char * command[count+1];
@@ -45,11 +63,12 @@ bool do_exec(int count, ...)
     for(i=0; i<count; i++)
     {
         command[i] = va_arg(args, char *);
+        
     }
     command[count] = NULL;
-    // this line is to avoid a compile warning before your implementation is complete
-    // and may be removed
-    command[count] = command[count];
+    
+    
+ /*   command[count] = command[count];*/
 
 /*
  * TODO:
@@ -61,9 +80,71 @@ bool do_exec(int count, ...)
  *
 */
 
-    va_end(args);
+    /* Fork */
+    forkpid = fork();
+    
+    if (forkpid == -1)
+    {
+        /* Fork failed */
+        va_end(args);
+        return false;
+    }
 
-    return true;
+    if (forkpid == 0)
+    {
+        /* Call execv */
+    /*    printf("\n exec with arguments : %s %s ", command[0], command[1]);*/
+      returnedexec = execv(command[0],command);
+ 
+        
+        if ( returnedexec == -1 )
+        {
+            /* execv failed */
+            va_end(args);
+            exit (EXIT_FAILURE);
+        }
+        va_end(args);
+
+        return true;
+    }
+    else {
+
+        /* Wait the end of completion */
+        returnedwait = wait(&returnedvalue);
+        if ( returnedwait == -1)
+        {
+            /* Waitpid failed */
+            va_end(args);
+            return false;
+        }
+
+        if ( WIFEXITED(returnedvalue))
+        {
+            /* the child exited correctly */
+            
+            /* Test the returned value of the child */
+            if ( WEXITSTATUS(returnedvalue))
+            {
+                va_end(args);
+                return false;
+            }
+            else
+            {    
+                va_end(args);
+                return true;
+            }
+        }
+        else
+        {
+            /* the child exited with an error */
+            va_end(args);
+            return false;
+        }
+
+        va_end(args);
+
+        return true;
+   }
 }
 
 /**
@@ -73,6 +154,11 @@ bool do_exec(int count, ...)
 */
 bool do_exec_redirect(const char *outputfile, int count, ...)
 {
+    pid_t forkpid;
+    int returnedvalue;
+    int returnedexec;
+    int returnedwait;
+    
     va_list args;
     va_start(args, count);
     char * command[count+1];
@@ -82,9 +168,6 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         command[i] = va_arg(args, char *);
     }
     command[count] = NULL;
-    // this line is to avoid a compile warning before your implementation is complete
-    // and may be removed
-    command[count] = command[count];
 
 
 /*
@@ -95,7 +178,83 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *
 */
 
-    va_end(args);
+/* Open the file that will be used as redirection */
+    int fd = open(outputfile, O_WRONLY|O_TRUNC|O_CREAT, 0644);
 
-    return true;
+    if (fd < 0) 
+    {
+    /* Could not open the file */
+        return false;
+    }
+
+    /* Fork */
+    forkpid = fork();
+    
+    if (forkpid == -1)
+    {
+        /* Fork failed */
+        va_end(args);
+        return false;
+    }
+
+    if (forkpid == 0)
+    {
+        if (dup2(fd, 1) < 0) 
+        { 
+          va_end(args);
+          exit (EXIT_FAILURE);  
+        }
+        /* Call execv */
+    /*    printf("\n exec with arguments : %s %s ", command[0], command[1]);*/
+      returnedexec = execv(command[0],command);
+ 
+        
+        if ( returnedexec == -1 )
+        {
+            /* execv failed */
+            va_end(args);
+            exit (EXIT_FAILURE);
+        }
+        va_end(args);
+
+        return true;
+    }
+    else {
+
+        /* Wait the end of completion */
+        returnedwait = wait(&returnedvalue);
+        if ( returnedwait == -1)
+        {
+            /* Waitpid failed */
+            va_end(args);
+            return false;
+        }
+
+        if ( WIFEXITED(returnedvalue))
+        {
+            /* the child exited correctly */
+            
+            /* Test the returned value of the child */
+            if ( WEXITSTATUS(returnedvalue))
+            {
+                va_end(args);
+                return false;
+            }
+            else
+            {    
+                va_end(args);
+                return true;
+            }
+        }
+        else
+        {
+            /* the child exited with an error */
+            va_end(args);
+            return false;
+        }
+
+        va_end(args);
+
+        return true;
+   }
 }

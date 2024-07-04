@@ -1,4 +1,4 @@
-# Install script for directory: /home/sesa214884/GIT/coursera/assignment-1-sbaans
+# Install script for directory: /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/sesa214884/GIT/coursera/assignment-1-sbaans/build/assignment-autotest/cmake_install.cmake")
+  include("/home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/build/assignment-autotest/cmake_install.cmake")
 
 endif()
 
@@ -56,5 +56,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/sesa214884/GIT/coursera/assignment-1-sbaans/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

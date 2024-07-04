@@ -1,8 +1,8 @@
 assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o: \
- /home/sesa214884/GIT/coursera/assignment-1-sbaans/assignment-autotest/Unity/src/unity.c \
+ /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/assignment-autotest/Unity/src/unity.c \
  /usr/include/stdc-predef.h \
- /home/sesa214884/GIT/coursera/assignment-1-sbaans/assignment-autotest/Unity/src/unity.h \
- /home/sesa214884/GIT/coursera/assignment-1-sbaans/assignment-autotest/Unity/src/unity_internals.h \
+ /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/assignment-autotest/Unity/src/unity.h \
+ /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/assignment-autotest/Unity/src/unity_internals.h \
  /usr/include/setjmp.h /usr/include/features.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \

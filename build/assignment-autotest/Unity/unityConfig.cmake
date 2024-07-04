@@ -50,14 +50,14 @@ unset(_cmake_expected_targets)
 add_library(unity STATIC IMPORTED)
 
 set_target_properties(unity PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "/home/sesa214884/GIT/coursera/assignment-1-sbaans/assignment-autotest/Unity/src"
+  INTERFACE_INCLUDE_DIRECTORIES "/home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/assignment-autotest/Unity/src"
 )
 
 # Import target "unity" for configuration ""
 set_property(TARGET unity APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
 set_target_properties(unity PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES_NOCONFIG "C"
-  IMPORTED_LOCATION_NOCONFIG "/home/sesa214884/GIT/coursera/assignment-1-sbaans/build/assignment-autotest/Unity/src/libunity.a"
+  IMPORTED_LOCATION_NOCONFIG "/home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/build/assignment-autotest/Unity/src/libunity.a"
   )
 
 # This file does not depend on other imported targets which have

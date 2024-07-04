@@ -1,7 +1,7 @@
 assignment-autotest/CMakeFiles/assignment-autotest.dir/__/examples/autotest-validate/autotest-validate.c.o: \
- /home/sesa214884/GIT/coursera/assignment-1-sbaans/examples/autotest-validate/autotest-validate.c \
+ /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/examples/autotest-validate/autotest-validate.c \
  /usr/include/stdc-predef.h \
- /home/sesa214884/GIT/coursera/assignment-1-sbaans/examples/autotest-validate/autotest-validate.h \
+ /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/examples/autotest-validate/autotest-validate.h \
  /usr/lib/gcc/x86_64-linux-gnu/9/include/stdbool.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/x86_64-linux-gnu/sys/cdefs.h \

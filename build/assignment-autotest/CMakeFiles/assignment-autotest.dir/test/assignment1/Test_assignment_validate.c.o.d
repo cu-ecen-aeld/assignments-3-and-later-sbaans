@@ -1,8 +1,8 @@
 assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_assignment_validate.c.o: \
- /home/sesa214884/GIT/coursera/assignment-1-sbaans/assignment-autotest/test/assignment1/Test_assignment_validate.c \
+ /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/assignment-autotest/test/assignment1/Test_assignment_validate.c \
  /usr/include/stdc-predef.h \
- /home/sesa214884/GIT/coursera/assignment-1-sbaans/assignment-autotest/Unity/src/unity.h \
- /home/sesa214884/GIT/coursera/assignment-1-sbaans/assignment-autotest/Unity/src/unity_internals.h \
+ /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/assignment-autotest/Unity/src/unity.h \
+ /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/assignment-autotest/Unity/src/unity_internals.h \
  /usr/include/setjmp.h /usr/include/features.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
@@ -47,4 +47,4 @@ assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_ass
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/sys_errlist.h \
  /usr/lib/gcc/x86_64-linux-gnu/9/include/stdbool.h \
- /home/sesa214884/GIT/coursera/assignment-1-sbaans/assignment-autotest/./examples/autotest-validate/autotest-validate.h
+ /home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/assignment-autotest/./examples/autotest-validate/autotest-validate.h
