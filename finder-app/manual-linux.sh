@@ -11,9 +11,20 @@ KERNEL_VERSION=v5.1.10
 BUSYBOX_VERSION=1_33_1
 FINDER_APP_DIR=$(realpath $(dirname $0))
 ARCH=arm64
-CROSS_COMPILE=/home/sesa214884/arm_cross_compiler/bin/aarch64-none-linux-gnu-
-SYSROOT_FOLDER=/home/sesa214884/arm_cross_compiler/aarch64-none-linux-gnu/libc
-WRITER_PROJECT_FOLDER=/home/sesa214884/GIT/coursera/tes/assignments-3-and-later-sbaans/finder-app
+
+TOOLCHAIN_DIR=/tmp/toolchain
+CROSS_COMPILE=${TOOLCHAIN_DIR}/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
+SYSROOT_FOLDER=${TOOLCHAIN_DIR}/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/aarch64-none-linux-gnu/libc
+WRITER_PROJECT_FOLDER=$(realpath $(dirname $0))
+
+#Install CROSS Compiler
+mkdir -p ${TOOLCHAIN_DIR}
+
+cd "$TOOLCHAIN_DIR"
+
+wget -c https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz --no-check-certificate
+
+tar xf gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz
 
 if [ $# -lt 1 ]
 then
