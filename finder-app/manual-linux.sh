@@ -6,8 +6,9 @@ set -e
 set -u
 
 OUTDIR=/tmp/aeld
+
 KERNEL_REPO=git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
-KERNEL_VERSION=v5.1.10
+KERNEL_VERSION=v5.15.163
 BUSYBOX_VERSION=1_33_1
 FINDER_APP_DIR=$(realpath $(dirname $0))
 ARCH=arm64
@@ -37,11 +38,16 @@ fi
 mkdir -p ${OUTDIR}
 
 cd "$OUTDIR"
+<<<<<<< HEAD
 if [ ! -d "${OUTDIR}/linux" ]; then
+=======
+if [ ! -d "${OUTDIR}/linux-stable" ]; then
+>>>>>>> assignments-base/assignment4
     #Clone only if the repository does not exist.
 	echo "CLONING GIT LINUX STABLE VERSION ${KERNEL_VERSION} IN ${OUTDIR}"
 	git clone ${KERNEL_REPO} --depth 1 --single-branch --branch ${KERNEL_VERSION}
 fi
+<<<<<<< HEAD
 if [ ! -e ${OUTDIR}/linux/arch/${ARCH}/boot/Image ]; then
     cd linux
     echo "Checking out version ${KERNEL_VERSION}"
@@ -55,6 +61,14 @@ if [ ! -e ${OUTDIR}/linux/arch/${ARCH}/boot/Image ]; then
     make -j4 ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} Image
     
     cp -a arch/arm64/boot/Image ${OUTDIR}
+=======
+if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
+    cd linux-stable
+    echo "Checking out version ${KERNEL_VERSION}"
+    git checkout ${KERNEL_VERSION}
+
+    # TODO: Add your kernel build steps here
+>>>>>>> assignments-base/assignment4
 fi
 
 echo "Adding the Image in outdir"
@@ -67,12 +81,16 @@ then
     sudo rm  -rf ${OUTDIR}/rootfs
 fi
 
+<<<<<<< HEAD
 # TODO: Create necessary base directories :OK
 mkdir -p rootfs
 cd rootfs
 mkdir -p bin dev etc home lib lib64 proc sbin sys tmp usr var
 mkdir -p usr/bin usr/lib usr/sbin
 mkdir -p var/log
+=======
+# TODO: Create necessary base directories
+>>>>>>> assignments-base/assignment4
 
 cd "$OUTDIR"
 if [ ! -d "${OUTDIR}/busybox" ]
@@ -80,23 +98,34 @@ then
 git clone git://busybox.net/busybox.git
     cd busybox
     git checkout ${BUSYBOX_VERSION}
+<<<<<<< HEAD
     # TODO:  Configure busybox :OK
     make distclean
     make defconfig
+=======
+    # TODO:  Configure busybox
+>>>>>>> assignments-base/assignment4
 else
     cd busybox
 fi
 
+<<<<<<< HEAD
 # TODO: Make and install busybox :OK
 make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
 make CONFIG_PREFIX=${OUTDIR}/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
 
 echo "Library dependencies"
 cd ${OUTDIR}/rootfs
+=======
+# TODO: Make and install busybox
+
+echo "Library dependencies"
+>>>>>>> assignments-base/assignment4
 ${CROSS_COMPILE}readelf -a bin/busybox | grep "program interpreter"
 ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 
 # TODO: Add library dependencies to rootfs
+<<<<<<< HEAD
 cp -a ${SYSROOT_FOLDER}/lib/ld-linux-aarch64.so.1 ${OUTDIR}/rootfs/lib
 cp -a ${SYSROOT_FOLDER}/lib64/ld-2.33.so ${OUTDIR}/rootfs/lib64
 
@@ -138,3 +167,16 @@ cd "$OUTDIR/rootfs"
 find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
 cd ..
 gzip -f initramfs.cpio
+=======
+
+# TODO: Make device nodes
+
+# TODO: Clean and build the writer utility
+
+# TODO: Copy the finder related scripts and executables to the /home directory
+# on the target rootfs
+
+# TODO: Chown the root directory
+
+# TODO: Create initramfs.cpio.gz
+>>>>>>> assignments-base/assignment4

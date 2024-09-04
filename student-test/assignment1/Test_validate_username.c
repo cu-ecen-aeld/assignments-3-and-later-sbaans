@@ -4,7 +4,10 @@
 #include "../../examples/autotest-validate/autotest-validate.h"
 #include "../../assignment-autotest/test/assignment1/username-from-conf-file.h"
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> assignments-base/assignment4
 /**
 * This function should:
 *   1) Call the my_username() function in Test_assignment_validate.c to get your hard coded username.
@@ -19,7 +22,6 @@ void test_validate_my_username()
      * TODO: Replace the line below with your code here as described above to verify your /conf/username.txt 
      * config file and my_username() functions are setup properly
      */
-
     /* Print the value from my_username */
     const char *hardcoded_username;
     const char *username_from_conf;
@@ -35,5 +37,4 @@ void test_validate_my_username()
 
     /* Verify that they are equals */
     TEST_ASSERT_EQUAL_STRING_MESSAGE(hardcoded_username,username_from_conf,"The TEST is NOT OK, the strings are different");
-
 }

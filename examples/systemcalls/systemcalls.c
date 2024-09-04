@@ -63,12 +63,12 @@ bool do_exec(int count, ...)
     for(i=0; i<count; i++)
     {
         command[i] = va_arg(args, char *);
-        
     }
     command[count] = NULL;
     
     
  /*   command[count] = command[count];*/
+
 
 /*
  * TODO:
@@ -157,7 +157,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     int returnedvalue;
     int returnedexec;
     int returnedwait;
-    
+
     va_list args;
     va_start(args, count);
     char * command[count+1];
