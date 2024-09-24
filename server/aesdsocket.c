@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <syslog.h>
 #include <string.h>
 #include <sys/types.h>
@@ -16,6 +17,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <signal.h>
 
 #define CONNECTION_PORT "9000"
 
@@ -25,6 +27,8 @@
 
 #define SERVER_FILE_NAME "/var/tmp/aesdsocketdata"
 
+bool bcaught_signal;
+
 // get sockaddr, IPv4 or IPv6:
 void *get_client_IP_addr(struct sockaddr *client_addr)
 {
@@ -33,6 +37,13 @@ void *get_client_IP_addr(struct sockaddr *client_addr)
 	}
 
 	return &(((struct sockaddr_in6*)client_addr)->sin6_addr);
+}
+
+static void sigaction_handler ( int signalnumber)
+{
+	if ( (signalnumber == SIGINT) || (signalnumber == SIGTERM) ) {
+		bcaught_signal = true;
+	}
 }
 
 int main(int argc, char *argv[])
@@ -47,23 +58,50 @@ int main(int argc, char *argv[])
     char client_ip_addr[INET6_ADDRSTRLEN];
     int max_received_length = MAX_RECEIVED_LENGTH;
     char received_buff[MAX_RECEIVED_LENGTH];
-    char *send_buff;
+    char *send_buff = NULL;
     int received_length, send_length;
     FILE *filetobewritten;
     int bEnd_of_line = 0;
     struct stat file_stat;
+    int bDaemonmode = 0;
+    int sock_option=1;
+    struct sigaction signal_management;
     
+    bcaught_signal = false;
+
+
+    memset(&signal_management, 0, sizeof(struct sigaction));
+
+    signal_management.sa_handler = sigaction_handler;
+
+
 	/* Activate syslog */
 	openlog(NULL,0,LOG_USER);
 	
-	if (argc != 1)
+	if (argc > 2)
 	{
 		printf("Error, too many arguments");
-		syslog(LOG_ERR,"Invalid Number of arguments: %d , it should be 0", (argc - 1));
+		syslog(LOG_ERR,"Invalid Number of arguments: %d , it should be 1 or 2", (argc - 1));
 		return -1;
 	}
 	syslog(LOG_DEBUG,"Good Number of parameters");
 	
+	if (argc == 2) {
+		if ( strcmp(argv[1],"-d") != 0 ) {
+			syslog(LOG_ERR,"Invalid Argument: only -d is accepted");
+			return -1;
+		} else {
+			bDaemonmode = 1;
+		}
+	} else {
+		bDaemonmode = 0;
+	}
+
+	if (bDaemonmode == 1) {
+		syslog(LOG_DEBUG,"Daemon mode started");
+		daemon(0,0);
+	}
+
 	/* Call to the getaddrinfo function */
 	memset(&socket_requirements, 0, sizeof socket_requirements);
 	
@@ -87,7 +125,13 @@ int main(int argc, char *argv[])
 	        /* this is not a valid one */
 	        continue;
 	    } else {
-	        /* test bind */
+
+	    	if (setsockopt(socket_descriptor, SOL_SOCKET, SO_REUSEADDR, &sock_option,sizeof(int)) == -1) {
+	    		printf("Unable to setsockopt\n");
+	    		syslog(LOG_ERR,"Unable to setsockopt\n");
+	    		exit(1);
+	    	}
+	    	/* test bind */
 	        if ( bind(socket_descriptor, socket_test->ai_addr, socket_test->ai_addrlen) == -1) {
 	            /* this is not a valid one */
 	            close(socket_descriptor);
@@ -109,6 +153,9 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	
+	sigaction(SIGTERM, &signal_management, NULL);
+	sigaction(SIGINT, &signal_management, NULL);
+
 	/* listening */
 	if ( listen(socket_descriptor, LISTEN_QUEUE_SIZE) == -1) {
 	    printf("Error: could not listen\n");
@@ -180,14 +227,32 @@ int main(int argc, char *argv[])
 			if (filetobewritten != NULL) {
 					fclose(filetobewritten);
 				}
-			free(send_buff);
+			if (send_buff != NULL){
+				free(send_buff);
+			}
 			exit(0);
 		}
 
 		close(accept_socket_descriptor);
 
+		if (bcaught_signal == true) {
+			/* a signal was sent */
+			if (send_buff != NULL){
+				free(send_buff);
+			}
+
+			if (filetobewritten != NULL) {
+				fclose(filetobewritten);
+			}
+			syslog(LOG_DEBUG,"Caught signal, exiting");
+			remove(SERVER_FILE_NAME);
+			return 0;
+		}
+
 	}
-	free(send_buff);
+	if (send_buff != NULL){
+		free(send_buff);
+	}
 	if (filetobewritten != NULL) {
 		fclose(filetobewritten);
 	}
