@@ -14,9 +14,6 @@
 # Description: Daemon for aesdsocket
 ### END INIT INFO
 
-# Source function library.
-. /etc/init.d/functions
-
 prog="aesdsocket"
 exec="/usr/bin/$prog"
 
@@ -24,21 +21,11 @@ AESDSOCKETDAEMON_ARGS="-d"
 
 start() {
     [ -x $exec ] || exit 5
-
-    check_for_cleanup
-
-    if ! [ -f $pidfile ]; then
         printf "Starting %s:\t" "$prog"
         # start aesdsocket daemon
         start-stop-daemon --start --exec "$exec" -- $AESDSOCKETDAEMON_ARGS
-        success
+        printf "aesdsocket launched...\n"
         echo
-    else
-        failure
-        echo
-        printf "aesdsocket still exists...\n"
-        exit 7
-    fi
 }
 
 stop() {
@@ -59,10 +46,6 @@ reload() {
 
 force_reload() {
     restart
-}
-
-
-check_for_cleanup() {
 }
 
 case "$1" in
