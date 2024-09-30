@@ -1,0 +1,69 @@
+#!/bin/sh
+
+# Script to start aesdsocket server
+
+### BEGIN INIT INFO
+# Provides:       aesdsocket
+# Required-Start:
+# Required-Stop:
+# Should-Start:
+# Should-Stop:
+# Default-Start: 5
+# Default-Stop:  0 6
+# Short-Description: start and stop aesdsocket
+# Description: Daemon for aesdsocket
+### END INIT INFO
+
+prog="aesdsocket"
+exec="/usr/bin/$prog"
+
+AESDSOCKETDAEMON_ARGS="-d"
+
+start() {
+    [ -x $exec ] || exit 5
+        printf "Starting %s:\t" "$prog"
+        # start aesdsocket daemon
+        start-stop-daemon --start --exec "$exec" -- $AESDSOCKETDAEMON_ARGS
+        printf "aesdsocket launched...\n"
+        echo
+}
+
+stop() {
+    echo -n "Stopping $prog: "
+    start-stop-daemon --stop --exec "$exec"
+    retval=$?
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    restart
+}
+
+force_reload() {
+    restart
+}
+
+case "$1" in
+    start)
+        $1
+        ;;
+    stop)
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|force-reload}"
+        exit 2
+esac
+
+exit $?

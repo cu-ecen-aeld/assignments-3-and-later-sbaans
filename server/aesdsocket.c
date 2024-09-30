@@ -68,8 +68,9 @@ int main(int argc, char *argv[])
     struct sigaction signal_management;
     
 
-    /* install netcat */
+    /* install netcat
     system("./install_nc.sh");
+*/
 
     bcaught_signal = false;
 
