@@ -266,9 +266,9 @@ int main(int argc, char *argv[])
     delay.it_interval.tv_sec = 10;
     delay.it_interval.tv_usec = 0;
 
-    /* install netcat
+    /* install netcat */
     system("./install_nc.sh");
-*/
+
 
     bcaught_signal = false;
 
