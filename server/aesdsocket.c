@@ -115,6 +115,8 @@ void* connectionthreadfunc(void* thread_param)
 	FILE *filetobewritten;
 	struct stat file_stat;
 
+	size_t retsize = 0;
+
 	thread_func_args->thread_complete_success = false;
 
     /* Claim Mutex */
@@ -155,9 +157,12 @@ void* connectionthreadfunc(void* thread_param)
 	send_length = file_stat.st_size;
 	send_buff = malloc(send_length);
 
-	fread(send_buff, sizeof(char), send_length, filetobewritten);
+	retsize = fread(send_buff, sizeof(char), send_length, filetobewritten);
 
-
+	if ( retsize == -1 )
+	{
+		printf("Error retsize \n");
+	}
 
 	if (send(thread_func_args->accept_socket_descriptor, &send_buff[0], send_length, 0) == -1) {
 		syslog(LOG_ERR,"Error: could not send\n");
@@ -266,8 +271,10 @@ int main(int argc, char *argv[])
     delay.it_interval.tv_sec = 10;
     delay.it_interval.tv_usec = 0;
 
+    int retvalue = 0;
+
     /* install netcat */
-    system("./install_nc.sh");
+    retvalue = system("./install_nc.sh");
 
 
     bcaught_signal = false;
@@ -303,7 +310,7 @@ int main(int argc, char *argv[])
 
 	if (bDaemonmode == 1) {
 		syslog(LOG_DEBUG,"Daemon mode started");
-		daemon(0,0);
+		retvalue = daemon(0,0);
 	}
 
 	/* Call to the getaddrinfo function */
@@ -469,7 +476,10 @@ int main(int argc, char *argv[])
 */
 		}
 
-
+		if ( retvalue == -1)
+		{
+			printf("Error in retvalue !!\n");
+		}
 
 	}
 	return 0;
