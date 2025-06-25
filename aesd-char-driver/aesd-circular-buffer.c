@@ -7,7 +7,6 @@
  * @copyright Copyright (c) 2020
  *
  */
-
 #ifdef __KERNEL__
 #include <linux/string.h>
 #else
@@ -32,6 +31,40 @@ struct aesd_buffer_entry *aesd_circular_buffer_find_entry_offset_for_fpos(struct
     /**
     * TODO: implement per description
     */
+	size_t current_position = 0;
+	uint8_t write_ptr = 0;
+	uint8_t read_ptr = 0;;
+
+	struct aesd_buffer_entry *current_entry = NULL;
+
+	uint8_t index;
+
+	/* Get the current read and write pointers */
+	write_ptr = buffer->in_offs;
+	read_ptr = buffer->out_offs;
+
+	/* Verify if it is not empty */
+	if ( (write_ptr == read_ptr) && (buffer->full == false)) {
+		return NULL;
+	}
+
+	/* Loop to find the right position */
+	index = read_ptr;
+
+	do {
+		current_entry = &(buffer->entry[index]);
+
+		/* Test if it is the good entry */
+		if ( (current_position + current_entry->size) > char_offset) {
+			*entry_offset_byte_rtn = ( char_offset - current_position );
+			return current_entry;
+		} else {
+			current_position += current_entry->size;
+			index = (index + 1)%AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED;
+		}
+
+	} while (index != write_ptr);
+
     return NULL;
 }
 
@@ -47,6 +80,25 @@ void aesd_circular_buffer_add_entry(struct aesd_circular_buffer *buffer, const s
     /**
     * TODO: implement per description
     */
+
+	/* Writing at in pointer */
+	(buffer->entry[buffer->in_offs]).size = add_entry->size;
+	(buffer->entry[buffer->in_offs]).buffptr = add_entry->buffptr;
+
+	/* Increment in pointer */
+
+	(buffer->in_offs) = ((buffer->in_offs) + 1)%AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED;
+
+	/* If buffer was full, out pointer should be set equal to in pointer */
+	if (buffer->full == true) {
+		(buffer->out_offs) = (buffer->in_offs);
+	}
+
+
+	/* If in pointer is equal to out pointer and buffer was not full then it is full now */
+	if ( ( (buffer->out_offs) == (buffer->in_offs) )&& (buffer->full == false)) {
+		buffer->full = true;
+	}
 }
 
 /**
