@@ -97,14 +97,19 @@ ssize_t aesd_read(struct file *filp, char __user *buf, size_t count,
 
 		if (remaining_bytes_to_read < remaining_entry_bytes ) {
 			// Copy the remaining values of the entry up until count
+			PDEBUG("copy %zu bytes to user buffer",remaining_bytes_to_read);
 			retcode = copy_to_user(buf, &(current_entry->buffptr)[entry_offset_byte], remaining_bytes_to_read);
+			PDEBUG("copy done retcode = %zu",retcode);
 			retval += remaining_bytes_to_read;
 			// And it is finished
 			return retval;
 		} else {
 			// Copy the remaining values of the entry up until the end of entry
+			PDEBUG("copy %zu bytes to user buffer",remaining_entry_bytes);
 			retcode = copy_to_user(buf, &(current_entry->buffptr)[entry_offset_byte], remaining_entry_bytes);
+			PDEBUG("copy done retcode = %zu",retcode);
 			retval += remaining_entry_bytes;
+			buf += remaining_entry_bytes;
 
 
 			// Prepare the next reading -> TO DO IN LOOP
@@ -129,20 +134,51 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
     const char *alloc_write_string;
     const char *memory_to_be_freed;
 	ssize_t retcode = -1;
-
+	size_t new_entry_bytes_nb = count;
+	const char *source_buffer = buf;
     // Protect with mutex
     //if (mutex_lock_interruptible(&d->lock))
 
+	// Test if there is no end of string character at the end
+	if (buf[new_entry_bytes_nb-1] != '\n') {
+		// we copy it in the waiting buffer
+		retcode = copy_from_user((void *)&aesd_device.waiting_bfr[aesd_device.waiting_bfr_offset], buf, new_entry_bytes_nb);
+		aesd_device.waiting_bfr_offset += new_entry_bytes_nb;
+		PDEBUG("copy %zu bytes with offset %lld from user buffer to Waiting buffer",new_entry_bytes_nb,*f_pos);
+		return retval;
+	}
+
+	// If there was something in the waiting buffer
+	if ( aesd_device.waiting_bfr_offset != 0 ) {
+		// we copy it in the waiting buffer
+		retcode = copy_from_user((void *)&aesd_device.waiting_bfr[aesd_device.waiting_bfr_offset], buf, new_entry_bytes_nb);
+		aesd_device.waiting_bfr_offset += new_entry_bytes_nb;
+		PDEBUG("copy %zu bytes with offset %lld from user buffer to Waiting buffer",new_entry_bytes_nb,*f_pos);
+
+		// Point the source to the waiting buffer
+		source_buffer = &aesd_device.waiting_bfr[0];
+		new_entry_bytes_nb = aesd_device.waiting_bfr_offset;
+
+		// Reinitialize the waiting buffer
+		aesd_device.waiting_bfr_offset = 0;
+	}
 
     // Allocate for the new string
-    alloc_write_string = kmalloc(count, GFP_KERNEL);
+    alloc_write_string = kmalloc(new_entry_bytes_nb, GFP_KERNEL);
 
+    PDEBUG("copy %zu bytes with offset %lld from user buffer",new_entry_bytes_nb,*f_pos);
     // Copy the values in the allocated buffer
-    retcode = copy_from_user((void *)alloc_write_string, buf, count);
+    if (source_buffer != buf) {
+    	retcode = memcpy((void *)alloc_write_string, source_buffer, new_entry_bytes_nb);
+    } else {
+		retcode = copy_from_user((void *)alloc_write_string, source_buffer, new_entry_bytes_nb);
+    }
 
+    PDEBUG("copy done retcode = %zu",retcode);
     // Add the new entry with the allocated buffer
     new_entry.buffptr = alloc_write_string;
-    new_entry.size=strlen(alloc_write_string);
+    new_entry.size = new_entry_bytes_nb;
+    PDEBUG("new entry size = %zu",new_entry.size);
 
     // Check if the buffer is full, if yes retrieve the pointer for desalloc
     if ((aesd_device.circ_buf).full == true) {
@@ -202,6 +238,10 @@ int aesd_init_module(void)
 
     /* Initialize Circular Buffer */
     aesd_circular_buffer_init(&(aesd_device.circ_buf));
+
+    /* Initialize Waiting Buffer */
+    memset(aesd_device.waiting_bfr,0,sizeof(aesd_device.waiting_bfr));
+    aesd_device.waiting_bfr_offset = 0;
 
     result = aesd_setup_cdev(&aesd_device);
 

@@ -12,6 +12,8 @@
 
 #define AESD_DEBUG 1  //Remove comment on this line to enable debug
 
+#define WAITING_BUFFER_SIZE 50
+
 #undef PDEBUG             /* undef it, just in case */
 #ifdef AESD_DEBUG
 #  ifdef __KERNEL__
@@ -34,6 +36,12 @@ struct aesd_dev
 
     /* Circular Buffer */
     struct aesd_circular_buffer circ_buf;
+
+    /* Waiting Buffer */
+    const char waiting_bfr[WAITING_BUFFER_SIZE];
+
+    /* Waiting Buffer offset */
+    uint8_t waiting_bfr_offset;
 };
 
 int aesd_open(struct inode *inode, struct file *filp);
