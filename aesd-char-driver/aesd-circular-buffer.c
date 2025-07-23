@@ -84,6 +84,7 @@ void aesd_circular_buffer_add_entry(struct aesd_circular_buffer *buffer, const s
 	/* Writing at in pointer */
 	(buffer->entry[buffer->in_offs]).size = add_entry->size;
 	(buffer->entry[buffer->in_offs]).buffptr = add_entry->buffptr;
+	(buffer->entry[buffer->in_offs]).entry_index = buffer->in_offs;
 
 	/* Increment in pointer */
 

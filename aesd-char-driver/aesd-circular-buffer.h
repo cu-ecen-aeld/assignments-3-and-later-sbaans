@@ -28,6 +28,10 @@ struct aesd_buffer_entry
      * Number of bytes stored in buffptr
      */
     size_t size;
+    /**
+	 * Index of the entry in the array
+	 */
+    uint8_t entry_index;
 };
 
 struct aesd_circular_buffer
