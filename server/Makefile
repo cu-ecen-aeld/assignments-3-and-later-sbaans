@@ -1,4 +1,5 @@
 CFLAGS = -g -Wall -Werror
+LDFLAGS = -pthread
 
 all: aesdsocket
 
