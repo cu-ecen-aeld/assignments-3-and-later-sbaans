@@ -42,6 +42,9 @@ struct aesd_dev
 
     /* Waiting Buffer offset */
     uint8_t waiting_bfr_offset;
+
+    /* Mutex */
+    struct mutex lock;     /* mutual exclusion semaphore     */
 };
 
 int aesd_open(struct inode *inode, struct file *filp);
