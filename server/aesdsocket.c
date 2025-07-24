@@ -434,7 +434,9 @@ int main(int argc, char *argv[])
 
 		/*	printf("Caught signal, exiting\n");*/
 			syslog(LOG_DEBUG,"Caught signal, exiting");
+			#ifndef USE_AESD_CHAR_DEVICE
 			remove(SERVER_FILE_NAME);
+			#endif
 			return 0;
 		}
 
