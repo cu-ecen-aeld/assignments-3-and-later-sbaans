@@ -29,9 +29,10 @@
 #define LISTEN_QUEUE_SIZE 20
 
 #define MAX_RECEIVED_LENGTH (20 * 1024)
+#define MAX_FILE_LENGTH (128 * 1024)
 
 #ifdef USE_AESD_CHAR_DEVICE
-#define SERVER_FILE_NAME "/var/aesdchar"
+#define SERVER_FILE_NAME "/dev/aesdchar"
 #else
 #define SERVER_FILE_NAME "/var/tmp/aesdsocketdata"
 #endif
@@ -160,8 +161,10 @@ void* connectionthreadfunc(void* thread_param)
 	/* send back the file */
 	filetobewritten = fopen(SERVER_FILE_NAME, "r");
 	stat(SERVER_FILE_NAME, &file_stat);
-	send_length = file_stat.st_size;
+	send_length = MAX_FILE_LENGTH;
 	send_buff = malloc(send_length);
+
+	syslog(LOG_DEBUG,"File size is : %d\n", send_length);
 
 	retsize = fread(send_buff, sizeof(char), send_length, filetobewritten);
 
@@ -170,7 +173,7 @@ void* connectionthreadfunc(void* thread_param)
 		printf("Error retsize \n");
 	}
 
-	if (send(thread_func_args->accept_socket_descriptor, &send_buff[0], send_length, 0) == -1) {
+	if (send(thread_func_args->accept_socket_descriptor, &send_buff[0], retsize, 0) == -1) {
 		syslog(LOG_ERR,"Error: could not send\n");
 	}
 
@@ -268,23 +271,23 @@ int main(int argc, char *argv[])
     int num_slist_thread = 0;
 
     FILE *filetobecreated;
-
+#ifndef USE_AESD_CHAR_DEVICE
     struct itimerval delay;
     int ret;
     
-#ifndef USE_AESD_CHAR_DEVICE
     signal (SIGALRM, timestamp_alarm_handler);
-#endif
+
     delay.it_value.tv_sec = 1;
     delay.it_value.tv_usec = 0;
     delay.it_interval.tv_sec = 10;
     delay.it_interval.tv_usec = 0;
-
+#endif
     int retvalue = 0;
 
     /* install netcat */
+#ifdef INSTALL_NETCAT
     retvalue = system("./install_nc.sh");
-
+#endif
 
     bcaught_signal = false;
 
@@ -396,13 +399,14 @@ int main(int argc, char *argv[])
 	}
 
 	/* Launch timestamping */
-
+	#ifndef USE_AESD_CHAR_DEVICE
 	ret = setitimer (ITIMER_REAL, &delay, NULL);
 	if (ret) {
 		printf("Error, can not set timestamping");
 		syslog(LOG_ERR,"Error, can not set timestamping");
 		return -1;
 	}
+	#endif
 
 	while(1) {
 
