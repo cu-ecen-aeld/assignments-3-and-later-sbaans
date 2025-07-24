@@ -22,13 +22,19 @@
 #include <signal.h>
 #include <time.h>
 
+#define USE_AESD_CHAR_DEVICE 1
+
 #define CONNECTION_PORT "9000"
 
 #define LISTEN_QUEUE_SIZE 20
 
 #define MAX_RECEIVED_LENGTH (20 * 1024)
 
+#ifdef USE_AESD_CHAR_DEVICE
+#define SERVER_FILE_NAME "/var/aesdchar"
+#else
 #define SERVER_FILE_NAME "/var/tmp/aesdsocketdata"
+#endif
 
 bool bcaught_signal;
 pthread_mutex_t mutex;
@@ -265,7 +271,10 @@ int main(int argc, char *argv[])
 
     struct itimerval delay;
     int ret;
+    
+#ifndef USE_AESD_CHAR_DEVICE
     signal (SIGALRM, timestamp_alarm_handler);
+#endif
     delay.it_value.tv_sec = 1;
     delay.it_value.tv_usec = 0;
     delay.it_interval.tv_sec = 10;
