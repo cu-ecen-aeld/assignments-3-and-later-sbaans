@@ -16,6 +16,7 @@
 #include <linux/printk.h>
 #include <linux/types.h>
 #include <linux/cdev.h>
+#include <linux/slab.h>
 #include <linux/fs.h> // file_operations
 #include "aesdchar.h"
 #include "aesd-circular-buffer.h"
@@ -29,11 +30,12 @@ struct aesd_dev aesd_device;
 
 int aesd_open(struct inode *inode, struct file *filp)
 {
+	struct aesd_dev *dev;
     PDEBUG("open");
     /**
      * TODO: handle open
      */
-    struct aesd_dev *dev;
+
 
 	dev = container_of(inode->i_cdev, struct aesd_dev, cdev);
 	filp->private_data = dev;
@@ -132,17 +134,19 @@ ssize_t aesd_read(struct file *filp, char __user *buf, size_t count,
 ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
                 loff_t *f_pos)
 {
-    ssize_t retval = -ENOMEM;
-    PDEBUG("write %zu bytes with offset %lld",count,*f_pos);
+
+
     /**
      * TODO: handle write
      */
     struct aesd_buffer_entry new_entry;
     const char *alloc_write_string;
     const char *memory_to_be_freed;
+    ssize_t retval = -ENOMEM;
 	ssize_t retcode = -1;
 	size_t new_entry_bytes_nb = count;
 	const char *source_buffer = buf;
+	PDEBUG("write %zu bytes with offset %lld",count,*f_pos);
     // Protect with mutex
     //if (mutex_lock_interruptible(&d->lock))
 	if (mutex_lock_interruptible(&(aesd_device.lock)))

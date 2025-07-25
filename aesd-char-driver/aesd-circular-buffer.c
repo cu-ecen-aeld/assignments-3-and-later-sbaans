@@ -31,11 +31,12 @@ struct aesd_buffer_entry *aesd_circular_buffer_find_entry_offset_for_fpos(struct
     /**
     * TODO: implement per description
     */
+	struct aesd_buffer_entry *current_entry = NULL;
 	size_t current_position = 0;
 	uint8_t write_ptr = 0;
 	uint8_t read_ptr = 0;;
 
-	struct aesd_buffer_entry *current_entry = NULL;
+
 
 	uint8_t index;
 
