@@ -107,7 +107,7 @@ ssize_t aesd_read(struct file *filp, char __user *buf, size_t count,
 		// Remaining bytes in this entry
 		remaining_entry_bytes = (current_entry->size) - (entry_offset_byte);
 
-		if (remaining_bytes_to_read < remaining_entry_bytes ) {
+		if (remaining_bytes_to_read <= remaining_entry_bytes ) {
 			// Copy the remaining values of the entry up until count
 			PDEBUG("copy %zu bytes to user buffer",remaining_bytes_to_read);
 			retcode = copy_to_user(buf, &(current_entry->buffptr)[entry_offset_byte], remaining_bytes_to_read);
@@ -200,10 +200,16 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
     new_entry.buffptr = alloc_write_string;
     new_entry.size = new_entry_bytes_nb;
     PDEBUG("new entry size = %zu",new_entry.size);
+    // Add to the device total size
+    aesd_device.size += new_entry.size;
+    PDEBUG("added %zu bytes, total size = %zu",new_entry.size, aesd_device.size);
 
     // Check if the buffer is full, if yes retrieve the pointer for desalloc
     if ((aesd_device.circ_buf).full == true) {
     	memory_to_be_freed = (aesd_device.circ_buf).entry[(aesd_device.circ_buf).out_offs].buffptr;
+    	// Remove from the device total size
+    	aesd_device.size -= (aesd_device.circ_buf).entry[(aesd_device.circ_buf).out_offs].size;
+    	PDEBUG("removed %zu bytes, total size = %zu",(aesd_device.circ_buf).entry[(aesd_device.circ_buf).out_offs].size, aesd_device.size);
     	kfree(memory_to_be_freed);
     }
 
@@ -212,9 +218,6 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
 	*f_pos += new_entry_bytes_nb;
 	retval = new_entry_bytes_nb;
 	
-	if (aesd_device.size < *f_pos) {
-		aesd_device.size = *f_pos;
-	}
 
 	// Release mutex
 	mutex_unlock(&(aesd_device.lock));
@@ -229,8 +232,8 @@ struct file_operations aesd_fops = {
     .write =    aesd_write,
     .open =     aesd_open,
     .release =  aesd_release,
-    .llseek = aesd_llseek,
-    .unlocked_ioctl = aesd_ioctl,
+ /*   .llseek = aesd_llseek,*/
+/*    .unlocked_ioctl = aesd_ioctl,*/
 };
 
 loff_t aesd_llseek(struct file *filp, loff_t off, int whence)
