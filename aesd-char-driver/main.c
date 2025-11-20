@@ -232,8 +232,8 @@ struct file_operations aesd_fops = {
     .write =    aesd_write,
     .open =     aesd_open,
     .release =  aesd_release,
- /*   .llseek = aesd_llseek,*/
-/*    .unlocked_ioctl = aesd_ioctl,*/
+    .llseek = aesd_llseek,
+    .unlocked_ioctl = aesd_ioctl,
 };
 
 loff_t aesd_llseek(struct file *filp, loff_t off, int whence)
@@ -266,6 +266,22 @@ loff_t aesd_llseek(struct file *filp, loff_t off, int whence)
 
 long aesd_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
+	
+	switch(cmd) {
+
+	  case AESDCHAR_IOCSEEKTO:
+	  	loff_t offset;
+	  	struct aesd_seekto struct_arg;
+	  	struct_arg.write_cmd = (arg >> 16);
+	  	struct_arg.write_cmd_offset = (arg & 0xFF);
+	  	aesd_circular_buffer_find_fpos_from_cmd_and_offset(&(aesd_device.circ_buf),
+            struct_arg.write_cmd, struct_arg.write_cmd_offset, &offset);
+	  	aesd_llseek(filp, offset, 0);
+		break;
+		
+		default:
+		return -ENOTTY;
+	}
 	return 0;
 }
 
