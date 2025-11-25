@@ -15,6 +15,35 @@
 
 #include "aesd-circular-buffer.h"
 
+
+ /* search in the circular buffer the fpos with cmd be the number of the entry and offset the offset in this entry*/
+void aesd_circular_buffer_find_fpos_from_cmd_and_offset(struct aesd_circular_buffer *buffer,
+            size_t index_cmd, size_t index_offset, loff_t *index_fpos )
+{
+	struct aesd_buffer_entry *seek_entry = NULL;
+	loff_t current_offset = 0;
+	uint8_t read_ptr = 0;
+	uint8_t index = 0;
+	read_ptr = buffer->out_offs;
+	
+	index = read_ptr;
+	
+	do {
+		seek_entry = &(buffer->entry[index]);
+
+		/* Test if it is the good entry */
+		if ( index == index_cmd) {
+			current_offset += index_offset;
+			*index_fpos = current_offset;
+			return;
+		} else {
+			current_offset += seek_entry->size;
+			index = (index + 1)%AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED;
+		}
+
+	} while (true);
+
+}
 /**
  * @param buffer the buffer to search for corresponding offset.  Any necessary locking must be performed by caller.
  * @param char_offset the position to search for in the buffer list, describing the zero referenced
@@ -25,12 +54,6 @@
  * @return the struct aesd_buffer_entry structure representing the position described by char_offset, or
  * NULL if this position is not available in the buffer (not enough data is written).
  */
- 
-void aesd_circular_buffer_find_fpos_from_cmd_and_offset(struct aesd_circular_buffer *buffer,
-            size_t index_cmd, size_t index_offset, loff_t *index_fpos )
-{
-	
-}
 struct aesd_buffer_entry *aesd_circular_buffer_find_entry_offset_for_fpos(struct aesd_circular_buffer *buffer,
             size_t char_offset, size_t *entry_offset_byte_rtn )
 {
@@ -40,7 +63,7 @@ struct aesd_buffer_entry *aesd_circular_buffer_find_entry_offset_for_fpos(struct
 	struct aesd_buffer_entry *current_entry = NULL;
 	size_t current_position = 0;
 	uint8_t write_ptr = 0;
-	uint8_t read_ptr = 0;;
+	uint8_t read_ptr = 0;
 
 
 
