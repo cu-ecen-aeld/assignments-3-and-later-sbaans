@@ -37,6 +37,8 @@
 #define SERVER_FILE_NAME "/var/tmp/aesdsocketdata"
 #endif
 
+#define IOC_SEEK_STRING "AESDCHAR_IOCSEEKTO:"
+
 bool bcaught_signal;
 pthread_mutex_t mutex;
 
@@ -49,8 +51,6 @@ struct slist_thread_node {
        };
 
 SLIST_HEAD(slisthead, slist_thread_node) slist_thread_node_head;
-
-
 
 
 // get sockaddr, IPv4 or IPv6:
@@ -121,6 +121,7 @@ void* connectionthreadfunc(void* thread_param)
 	int received_length, send_length;
 	FILE *filetobewritten;
 	struct stat file_stat;
+	int retcmp = -1;
 
 	size_t retsize = 0;
 
@@ -129,7 +130,7 @@ void* connectionthreadfunc(void* thread_param)
     /* Claim Mutex */
     pthread_mutex_lock(thread_func_args->pmutex);
 
-    filetobewritten = fopen(SERVER_FILE_NAME, "a");
+    filetobewritten = fopen(SERVER_FILE_NAME, "a+");
 	if (filetobewritten == NULL)
 	{
 	/*	printf("Could not open the file\n");*/
@@ -145,8 +146,15 @@ void* connectionthreadfunc(void* thread_param)
 			syslog(LOG_ERR,"Error: could not receive\n");
 		}
 
-		/* Append the file */
-		fputs(received_buff, filetobewritten);
+		/* Verify if it is a ioctl seek command*/
+		retcmp = memcmp(IOC_SEEK_STRING, &received_buff[0],sizeof (IOC_SEEK_STRING));
+		
+		if (retcmp == 0){
+			syslog(LOG_INFO,"IOCTL command detected");
+		} else {
+			/* Append the file */
+			fputs(received_buff, filetobewritten);
+		}
 
 	/*	printf("append the file with %d characters\n", received_length);*/
 
@@ -157,9 +165,9 @@ void* connectionthreadfunc(void* thread_param)
 			/*printf("end of the line\n");*/
 		}
 	}
-	fclose(filetobewritten);
+//	fclose(filetobewritten);
 	/* send back the file */
-	filetobewritten = fopen(SERVER_FILE_NAME, "r");
+//	filetobewritten = fopen(SERVER_FILE_NAME, "r");
 	stat(SERVER_FILE_NAME, &file_stat);
 	send_length = MAX_FILE_LENGTH;
 	send_buff = malloc(send_length);
