@@ -266,12 +266,11 @@ loff_t aesd_llseek(struct file *filp, loff_t off, int whence)
 
 long aesd_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
+	loff_t offset;
+	struct aesd_seekto struct_arg;
 	
 	switch(cmd) {
-
 	  case AESDCHAR_IOCSEEKTO:
-	  	loff_t offset;
-	  	struct aesd_seekto struct_arg;
 	  	struct_arg.write_cmd = (arg >> 16);
 	  	struct_arg.write_cmd_offset = (arg & 0xFF);
 	  	aesd_circular_buffer_find_fpos_from_cmd_and_offset(&(aesd_device.circ_buf),
